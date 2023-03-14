@@ -131,3 +131,9 @@ dmypy.json
 .DS_Store
 
 archived_code/
+.Rproj.user
+
+/data
+/gcp-data
+.Rhistory
+*.Rproj

@@ -7,16 +7,16 @@ library(arrow)
 
 
 comments_in <- read_parquet(
-  str_c("files/","100-hour-board-comments",".parquet")
+  str_c("files/markdown/","100-hour-board-comments-md",".parquet")
 )
 
 questions_in <- read_parquet(
-  str_c("files/","100-hour-board-questions",".parquet")
+  str_c("files/markdown/","100-hour-board-questions-md",".parquet")
 )
 
 # parse -------------------------------------------------------------------
 
-comments <- 
+comments_in <- 
   comments_in |> 
   mutate(
     submission_info = str_remove_all(comment_info, "Question #\\d+ posted on "),
@@ -35,9 +35,9 @@ comments <-
     posted_date = format(posted_date, "%Y-%m-%d %H:%M:%S %Z"),
     posted_date_utc = format(posted_date_utc, "%Y-%m-%d %H:%M:%S %Z")
   ) |> 
-  select(-submission_info, -comment_info)
+  select(-submission_info, -comment_info, -posted_date_utc)
 
-questions <- 
+questions_in <- 
   questions_in |> 
   mutate(
     submission_info = str_remove_all(question_info, "Question #\\d+ posted on "),
@@ -56,23 +56,11 @@ questions <-
     posted_date = format(posted_date, "%Y-%m-%d %H:%M:%S %Z"),
     posted_date_utc = format(posted_date_utc, "%Y-%m-%d %H:%M:%S %Z")
   ) |> 
-  select(-submission_info, -question_info)
+  select(-submission_info, -question_info, -posted_date_utc)
 
-# questions |> 
-#   group_by(year = year(posted_date), month = month(posted_date)) |> 
-#   count() |> 
-#   ungroup() |> 
-#   mutate(dt = as_datetime(str_c(year,"-",month,"-01"))) |> 
-#   ggplot() +
-#   geom_line(
-#     aes(x = dt, y = n)
-#   ) +
-#   theme_minimal() +
-#   theme(
-#     axis.title = element_blank()
-#   )
-  
-# comments |>
+# chart -------------------------------------------------------------------
+
+# questions_in |>
 #   group_by(year = year(posted_date), month = month(posted_date)) |>
 #   count() |>
 #   ungroup() |>
@@ -81,6 +69,22 @@ questions <-
 #   geom_line(
 #     aes(x = dt, y = n)
 #   ) +
+#   ggtitle("100 Hour Board question submission frequency over time") +
+#   theme_minimal() +
+#   theme(
+#     axis.title = element_blank()
+#   )
+  
+# comments_in |>
+#   group_by(year = year(posted_date), month = month(posted_date)) |>
+#   count() |>
+#   ungroup() |>
+#   mutate(dt = as_datetime(str_c(year,"-",month,"-01"))) |>
+#   ggplot() +
+#   geom_line(
+#     aes(x = dt, y = n)
+#   ) +
+#   ggtitle("100 Hour Board question submission frequency over time") +
 #   theme_minimal() +
 #   theme(
 #     axis.title = element_blank()
